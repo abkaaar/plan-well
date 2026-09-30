@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<full-backup-content>
+    <!-- Local-only task DB; exclude from cloud backup to avoid leaking planner data. -->
+    <exclude domain="database" path="plan_well_db" />
+    <exclude domain="database" path="plan_well_db-shm" />
+    <exclude domain="database" path="plan_well_db-wal" />
+</full-backup-content>

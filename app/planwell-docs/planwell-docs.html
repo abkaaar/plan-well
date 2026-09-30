@@ -1,0 +1,1059 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+<title>Plan Well — Documentation Suite</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap"/>
+<style>
+  :root {
+    --bg: #EEF2F7;
+    --surface: #FFFFFF;
+    --sidebar: #0F172A;
+    --sidebar-hover: #1E293B;
+    --primary: #2563EB;
+    --primary-light: #EFF6FF;
+    --accent: #10B981;
+    --accent-light: #ECFDF5;
+    --warn: #F59E0B;
+    --danger: #EF4444;
+    --txt: #0F172A;
+    --txt-muted: #64748B;
+    --txt-faint: #94A3B8;
+    --border: #E2E8F0;
+    --radius: 8px;
+    --font: 'Plus Jakarta Sans', system-ui, sans-serif;
+    --mono: 'JetBrains Mono', monospace;
+    --sidebar-w: 230px;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--font); background: var(--bg); color: var(--txt); min-height: 100vh; display: flex; font-size: 14px; line-height: 1.6; }
+
+  /* Sidebar */
+  .sidebar {
+    width: var(--sidebar-w); background: var(--sidebar); display: flex; flex-direction: column;
+    position: fixed; top: 0; left: 0; height: 100vh; overflow-y: auto; z-index: 100;
+  }
+  .sidebar-logo { padding: 20px 18px 14px; border-bottom: 1px solid rgba(255,255,255,.08); }
+  .logo-mark { display: flex; align-items: center; gap: 9px; }
+  .logo-icon {
+    width: 32px; height: 32px; border-radius: 8px;
+    background: linear-gradient(135deg, #2563EB, #10B981);
+    display: flex; align-items: center; justify-content: center; flex-shrink: 0;
+  }
+  .logo-icon svg { width: 17px; height: 17px; fill: #fff; }
+  .logo-text { color: #F8FAFC; font-size: 15px; font-weight: 700; letter-spacing: -.3px; }
+  .logo-sub { color: #64748B; font-size: 10px; margin-top: 2px; text-transform: uppercase; letter-spacing: .5px; }
+  .sidebar-section { padding: 14px 12px 6px; }
+  .sidebar-label { color: #475569; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .8px; padding: 0 6px 6px; }
+  .nav-item {
+    display: flex; align-items: center; gap: 8px; padding: 8px 10px; border-radius: 6px;
+    cursor: pointer; color: #94A3B8; font-size: 12.5px; font-weight: 500; transition: all .15s;
+    margin-bottom: 2px; user-select: none;
+  }
+  .nav-item:hover { background: var(--sidebar-hover); color: #E2E8F0; }
+  .nav-item.active { background: rgba(37,99,235,.25); color: #93C5FD; }
+  .nav-item .badge {
+    margin-left: auto; background: rgba(255,255,255,.08); color: #64748B;
+    font-size: 10px; padding: 1px 6px; border-radius: 4px;
+  }
+  .nav-item.active .badge { background: rgba(37,99,235,.3); color: #93C5FD; }
+
+  /* Main */
+  .main { margin-left: var(--sidebar-w); flex: 1; min-height: 100vh; padding: 32px 36px; max-width: calc(100vw - var(--sidebar-w)); }
+
+  /* Doc panel */
+  .doc { display: none; }
+  .doc.active { display: block; }
+
+  /* Doc header */
+  .doc-header { margin-bottom: 28px; }
+  .doc-eyebrow { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .tag {
+    font-size: 10.5px; font-weight: 600; padding: 3px 9px; border-radius: 20px;
+    text-transform: uppercase; letter-spacing: .4px;
+  }
+  .tag-blue { background: var(--primary-light); color: var(--primary); }
+  .tag-green { background: var(--accent-light); color: #059669; }
+  .tag-amber { background: #FFFBEB; color: #B45309; }
+  .tag-purple { background: #F5F3FF; color: #7C3AED; }
+  .tag-rose { background: #FFF1F2; color: #BE123C; }
+  .tag-slate { background: #F1F5F9; color: #475569; }
+  .tag-teal { background: #F0FDFA; color: #0D9488; }
+
+  .doc-title { font-size: 26px; font-weight: 700; color: var(--txt); line-height: 1.2; letter-spacing: -.5px; }
+  .doc-subtitle { color: var(--txt-muted); font-size: 13.5px; margin-top: 5px; }
+  .doc-meta { display: flex; gap: 16px; margin-top: 12px; flex-wrap: wrap; }
+  .meta-item { font-size: 11.5px; color: var(--txt-faint); display: flex; align-items: center; gap: 5px; }
+
+  /* Divider */
+  .divider { height: 1px; background: var(--border); margin: 22px 0; }
+
+  /* Sections */
+  .section { margin-bottom: 28px; }
+  .section-title {
+    font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: .6px;
+    color: var(--primary); margin-bottom: 12px; display: flex; align-items: center; gap: 8px;
+  }
+  .section-title::after { content: ''; flex: 1; height: 1px; background: var(--primary-light); }
+
+  h3.sub { font-size: 14.5px; font-weight: 700; color: var(--txt); margin: 16px 0 8px; }
+  h4.mini { font-size: 13px; font-weight: 600; color: var(--txt); margin: 12px 0 6px; }
+
+  p { color: var(--txt-muted); font-size: 13.5px; line-height: 1.7; margin-bottom: 10px; }
+  p:last-child { margin-bottom: 0; }
+
+  /* Cards grid */
+  .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+  .card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 16px; 
+  }
+  .card-icon { font-size: 20px; margin-bottom: 8px; }
+  .card-label { font-size: 12.5px; font-weight: 700; color: var(--txt); margin-bottom: 4px; }
+  .card-desc { font-size: 12px; color: var(--txt-muted); line-height: 1.5; }
+
+  /* Table */
+  .tbl-wrap { overflow-x: auto; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); }
+  table { width: 100%; border-collapse: collapse; font-size: 12.5px; }
+  th { background: #F8FAFC; padding: 9px 14px; text-align: left; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--txt-muted); border-bottom: 1px solid var(--border); }
+  td { padding: 9px 14px; color: var(--txt-muted); border-bottom: 1px solid var(--border); vertical-align: top; }
+  tr:last-child td { border-bottom: none; }
+  td strong { color: var(--txt); font-weight: 600; }
+  .pill { display: inline-block; font-size: 10.5px; font-weight: 600; padding: 2px 8px; border-radius: 10px; }
+  .pill-green { background: var(--accent-light); color: #059669; }
+  .pill-blue { background: var(--primary-light); color: var(--primary); }
+  .pill-amber { background: #FFFBEB; color: #B45309; }
+  .pill-slate { background: #F1F5F9; color: #475569; }
+  .pill-purple { background: #F5F3FF; color: #7C3AED; }
+  .pill-rose { background: #FFF1F2; color: #BE123C; }
+
+  /* List */
+  ul.doc-list, ol.doc-list { padding-left: 18px; margin: 8px 0; }
+  ul.doc-list li, ol.doc-list li { font-size: 13px; color: var(--txt-muted); margin-bottom: 5px; line-height: 1.6; }
+  ul.doc-list li strong, ol.doc-list li strong { color: var(--txt); font-weight: 600; }
+
+  /* Code block */
+  .code-block {
+    background: #0F172A; color: #94A3B8; font-family: var(--mono);
+    font-size: 12px; padding: 16px; border-radius: var(--radius); overflow-x: auto;
+    margin: 10px 0; line-height: 1.7;
+  }
+  .code-block .k { color: #7DD3FC; } /* keyword */
+  .code-block .t { color: #86EFAC; } /* type */
+  .code-block .s { color: #FCA5A5; } /* string */
+  .code-block .c { color: #475569; font-style: italic; } /* comment */
+  .code-block .n { color: #C084FC; } /* annotation */
+
+  /* Info box */
+  .info-box {
+    border-left: 3px solid var(--primary); background: var(--primary-light);
+    padding: 12px 14px; border-radius: 0 var(--radius) var(--radius) 0; margin: 10px 0;
+    font-size: 13px; color: var(--txt-muted); line-height: 1.6;
+  }
+  .info-box.warn { border-color: var(--warn); background: #FFFBEB; }
+  .info-box.success { border-color: var(--accent); background: var(--accent-light); }
+
+  /* Timeline */
+  .timeline { position: relative; padding-left: 20px; }
+  .timeline::before { content: ''; position: absolute; left: 6px; top: 4px; bottom: 4px; width: 2px; background: var(--border); }
+  .tl-item { position: relative; margin-bottom: 20px; }
+  .tl-dot {
+    position: absolute; left: -18px; top: 3px; width: 12px; height: 12px;
+    border-radius: 50%; background: var(--primary); border: 2px solid var(--surface); box-shadow: 0 0 0 2px var(--primary);
+  }
+  .tl-dot.done { background: var(--accent); box-shadow: 0 0 0 2px var(--accent); }
+  .tl-dot.warn { background: var(--warn); box-shadow: 0 0 0 2px var(--warn); }
+  .tl-phase { font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .5px; color: var(--primary); }
+  .tl-title { font-size: 14px; font-weight: 700; color: var(--txt); margin: 2px 0 4px; }
+  .tl-body { font-size: 12.5px; color: var(--txt-muted); }
+
+  /* Wireframe mockup */
+  .mockup-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 16px; margin: 12px 0; }
+  .mockup-frame {
+    background: var(--surface); border: 1px solid var(--border); border-radius: 16px;
+    overflow: hidden; box-shadow: 0 2px 12px rgba(0,0,0,.06);
+  }
+  .mockup-bar {
+    background: var(--primary); padding: 10px 12px 8px;
+    font-size: 10px; color: rgba(255,255,255,.7); font-weight: 600;
+  }
+  .mockup-bar .screen-title { color: #fff; font-size: 13px; font-weight: 700; }
+  .mockup-body { padding: 10px 10px; }
+  .m-item {
+    background: #F8FAFC; border-radius: 6px; padding: 8px 10px; margin-bottom: 6px;
+    border-left: 3px solid var(--primary);
+  }
+  .m-item.green { border-color: var(--accent); }
+  .m-item.amber { border-color: var(--warn); }
+  .m-item-title { font-size: 11px; font-weight: 700; color: var(--txt); }
+  .m-item-sub { font-size: 10px; color: var(--txt-muted); }
+  .m-fab {
+    background: var(--primary); color: white; font-size: 18px;
+    width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center;
+    justify-content: center; margin: 8px auto 0; box-shadow: 0 2px 8px rgba(37,99,235,.4);
+  }
+  .m-search {
+    background: #F1F5F9; border-radius: 6px; padding: 7px 10px; margin-bottom: 8px;
+    font-size: 10px; color: var(--txt-faint);
+  }
+  .m-category {
+    display: flex; gap: 4px; flex-wrap: wrap; margin-bottom: 8px;
+  }
+  .m-cat-chip {
+    font-size: 9px; padding: 3px 7px; border-radius: 12px; font-weight: 600;
+    background: var(--primary-light); color: var(--primary);
+  }
+  .m-cat-chip.active { background: var(--primary); color: white; }
+  .m-nav {
+    display: flex; justify-content: space-around; padding: 8px 6px;
+    border-top: 1px solid var(--border); margin-top: 6px;
+  }
+  .m-nav-item { font-size: 9px; color: var(--txt-faint); text-align: center; }
+  .m-nav-item.active { color: var(--primary); }
+  .m-nav-icon { font-size: 14px; }
+
+  /* Color palette display */
+  .palette { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0; }
+  .swatch { border-radius: 8px; overflow: hidden; width: 80px; }
+  .swatch-color { height: 48px; }
+  .swatch-label { font-size: 10px; padding: 5px 6px; background: var(--surface); border: 1px solid var(--border); border-top: none; }
+  .swatch-name { font-weight: 700; color: var(--txt); }
+  .swatch-hex { color: var(--txt-muted); font-family: var(--mono); }
+
+  /* Checklist */
+  .checklist { list-style: none; padding: 0; }
+  .checklist li {
+    display: flex; align-items: flex-start; gap: 8px; padding: 7px 0;
+    border-bottom: 1px solid var(--border); font-size: 13px; color: var(--txt-muted);
+  }
+  .checklist li:last-child { border-bottom: none; }
+  .check { width: 16px; height: 16px; border-radius: 4px; background: var(--accent); display: flex; align-items: center; justify-content: center; flex-shrink: 0; margin-top: 1px; }
+  .check svg { width: 10px; height: 10px; stroke: white; stroke-width: 2.5; fill: none; }
+
+  /* Two-col layout */
+  .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  @media (max-width: 700px) { .two-col { grid-template-columns: 1fr; } }
+
+  /* DB Schema */
+  .schema-table {
+    background: #0F172A; border-radius: var(--radius); overflow: hidden;
+    font-family: var(--mono); font-size: 12px; margin: 10px 0;
+  }
+  .schema-header { background: #1E293B; padding: 8px 14px; color: #7DD3FC; font-weight: 700; letter-spacing: .3px; }
+  .schema-row { display: flex; gap: 0; border-bottom: 1px solid rgba(255,255,255,.05); }
+  .schema-row:last-child { border-bottom: none; }
+  .sc { padding: 6px 14px; }
+  .sc-name { color: #C084FC; flex: 0 0 140px; }
+  .sc-type { color: #86EFAC; flex: 0 0 110px; }
+  .sc-note { color: #64748B; flex: 1; }
+  .schema-row.pk .sc-name { color: #FCA5A5; }
+
+  /* Version badge */
+  .ver-badge {
+    display: inline-flex; align-items: center; gap: 6px; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 6px; padding: 6px 12px; font-size: 12.5px;
+    margin: 4px 4px 4px 0;
+  }
+  .ver-dot { width: 8px; height: 8px; border-radius: 50%; }
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <div class="logo-mark">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
+      </div>
+      <div>
+        <div class="logo-text">Plan Well</div>
+        <div class="logo-sub">Documentation Suite</div>
+      </div>
+    </div>
+  </div>
+  <div class="sidebar-section">
+    <div class="sidebar-label">Documents</div>
+    <div class="nav-item active" onclick="show('prd',this)">
+      📋 PRD <span class="badge">v1.0</span>
+    </div>
+    <div class="nav-item" onclick="show('srs',this)">
+      📐 SRS <span class="badge">v1.0</span>
+    </div>
+    <div class="nav-item" onclick="show('tdd',this)">
+      ⚙️ Technical Design <span class="badge">v1.0</span>
+    </div>
+    <div class="nav-item" onclick="show('uiux',this)">
+      🎨 UI/UX Specs <span class="badge">v1.0</span>
+    </div>
+    <div class="nav-item" onclick="show('roadmap',this)">
+      🗺️ Roadmap <span class="badge">v1.0</span>
+    </div>
+    <div class="nav-item" onclick="show('testplan',this)">
+      🧪 Test Plan <span class="badge">v1.0</span>
+    </div>
+    <div class="nav-item" onclick="show('deploy',this)">
+      🚀 Deployment <span class="badge">v1.0</span>
+    </div>
+  </div>
+  <div class="sidebar-section" style="margin-top:auto; padding-top:10px; border-top:1px solid rgba(255,255,255,.06)">
+    <div class="nav-item" style="font-size:11px; color:#475569;">Platform: Android (Kotlin)</div>
+    <div class="nav-item" style="font-size:11px; color:#475569;">Arch: MVVM + Room</div>
+  </div>
+</nav>
+
+<!-- MAIN CONTENT -->
+<main class="main">
+
+<!-- ═══════════ 1. PRD ═══════════ -->
+<section class="doc active" id="doc-prd">
+  <div class="doc-header">
+    <div class="doc-eyebrow"><span class="tag tag-blue">PRD</span><span style="font-size:11px;color:var(--txt-faint)">Product Requirements Document</span></div>
+    <div class="doc-title">Plan Well — Product Requirements Document</div>
+    <div class="doc-subtitle">Defines what the app should do: features, scope, user needs, and business goals.</div>
+    <div class="doc-meta">
+      <span class="meta-item">📅 Version 1.0</span>
+      <span class="meta-item">👤 Author: Dev (Foodma Technologies)</span>
+      <span class="meta-item">📱 Platform: Android</span>
+    </div>
+  </div>
+  <div class="divider"></div>
+
+  <div class="section">
+    <div class="section-title">1. Overview</div>
+    <p><strong>Plan Well</strong> is a lightweight, fully offline Android application that helps individuals organise their daily lives by planning tasks, setting reminders, and maintaining personal notes — all without requiring an internet connection. The app is designed for simplicity and speed, built natively in Kotlin.</p>
+    <div class="info-box success">Mission: Give every person a calm, reliable personal planning companion that works anywhere, anytime — even without data.</div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">2. Target Users</div>
+    <div class="card-grid">
+      <div class="card"><div class="card-icon">🎓</div><div class="card-label">Students</div><div class="card-desc">Scheduling assignments, exams, and class reminders in low-connectivity environments.</div></div>
+      <div class="card"><div class="card-icon">💼</div><div class="card-label">Professionals</div><div class="card-desc">Tracking meetings, deadlines, and personal to-dos alongside work commitments.</div></div>
+      <div class="card"><div class="card-icon">🏠</div><div class="card-label">Home Managers</div><div class="card-desc">Planning household tasks, shopping lists, and family schedules with recurring reminders.</div></div>
+      <div class="card"><div class="card-icon">🌍</div><div class="card-label">Users in Low-Connectivity Regions</div><div class="card-desc">People in areas with unreliable internet who need a planning tool that always works.</div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">3. Core Features</div>
+    <div class="tbl-wrap">
+      <table>
+        <thead><tr><th>Feature</th><th>Description</th><th>Priority</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Task Management</strong></td><td>Create, edit, delete, and complete tasks with title, description, due date, and priority.</td><td><span class="pill pill-rose">P0 — Must Have</span></td></tr>
+          <tr><td><strong>Reminders</strong></td><td>Set one-time or recurring (daily, weekly) reminders with local push notifications.</td><td><span class="pill pill-rose">P0 — Must Have</span></td></tr>
+          <tr><td><strong>Categories / Labels</strong></td><td>Organise tasks into user-defined categories (Work, Personal, Health, etc.) with colour coding.</td><td><span class="pill pill-blue">P1 — Should Have</span></td></tr>
+          <tr><td><strong>Quick Notes</strong></td><td>Attach freeform notes to any task or create standalone notes.</td><td><span class="pill pill-blue">P1 — Should Have</span></td></tr>
+          <tr><td><strong>Search</strong></td><td>Full-text search across tasks and notes, locally.</td><td><span class="pill pill-blue">P1 — Should Have</span></td></tr>
+          <tr><td><strong>Dashboard / Today View</strong></td><td>A summary home screen showing today's tasks, upcoming reminders, and completion stats.</td><td><span class="pill pill-blue">P1 — Should Have</span></td></tr>
+          <tr><td><strong>Completion Tracking</strong></td><td>Mark tasks complete, view history. Progress ring showing daily completion rate.</td><td><span class="pill pill-blue">P1 — Should Have</span></td></tr>
+          <tr><td><strong>Data Export</strong></td><td>Export tasks to a local JSON/CSV file for backup.</td><td><span class="pill pill-amber">P2 — Nice to Have</span></td></tr>
+          <tr><td><strong>Widget</strong></td><td>Android home-screen widget showing today's tasks.</td><td><span class="pill pill-amber">P2 — Nice to Have</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">4. Non-Goals (Out of Scope v1.0)</div>
+    <ul class="doc-list">
+      <li>No cloud sync or account/login system</li>
+      <li>No collaboration or sharing features</li>
+      <li>No iOS version</li>
+      <li>No AI/ML-powered suggestions</li>
+      <li>No calendar integration with Google/Outlook</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <div class="section-title">5. Success Metrics</div>
+    <div class="card-grid">
+      <div class="card"><div class="card-label">Day 30 Retention</div><div class="card-desc">≥ 40% of users return after 30 days of first install.</div></div>
+      <div class="card"><div class="card-label">Play Store Rating</div><div class="card-desc">Target ≥ 4.3 stars within 90 days of launch.</div></div>
+      <div class="card"><div class="card-label">Crash-Free Sessions</div><div class="card-desc">≥ 99.5% crash-free rate per Firebase Crashlytics.</div></div>
+      <div class="card"><div class="card-label">Reminder Delivery</div><div class="card-desc">≥ 98% of scheduled reminders delivered on time.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════ 2. SRS ═══════════ -->
+<section class="doc" id="doc-srs">
+  <div class="doc-header">
+    <div class="doc-eyebrow"><span class="tag tag-purple">SRS</span><span style="font-size:11px;color:var(--txt-faint)">Software Requirements Specification</span></div>
+    <div class="doc-title">Plan Well — Software Requirements Specification</div>
+    <div class="doc-subtitle">Technical functional and non-functional requirements for developers.</div>
+    <div class="doc-meta"><span class="meta-item">📅 Version 1.0</span><span class="meta-item">📱 Android 8.0+ (API 26+)</span><span class="meta-item">🔤 Language: Kotlin</span></div>
+  </div>
+  <div class="divider"></div>
+
+  <div class="section">
+    <div class="section-title">FR — Functional Requirements</div>
+
+    <h3 class="sub">FR-01 · Task Management</h3>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>ID</th><th>Requirement</th></tr></thead>
+      <tbody>
+        <tr><td><strong>FR-01.1</strong></td><td>The system shall allow users to create a task with: title (required, max 100 chars), description (optional, max 500 chars), due date/time (optional), priority (None / Low / Medium / High), and category (optional).</td></tr>
+        <tr><td><strong>FR-01.2</strong></td><td>The system shall allow editing of any task field at any time.</td></tr>
+        <tr><td><strong>FR-01.3</strong></td><td>The system shall allow soft-deletion (trash) and permanent deletion of tasks.</td></tr>
+        <tr><td><strong>FR-01.4</strong></td><td>The system shall allow marking a task as complete, which records a completion timestamp.</td></tr>
+        <tr><td><strong>FR-01.5</strong></td><td>The system shall support reordering of tasks by drag-and-drop within a list.</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3 class="sub">FR-02 · Reminders</h3>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>ID</th><th>Requirement</th></tr></thead>
+      <tbody>
+        <tr><td><strong>FR-02.1</strong></td><td>The system shall schedule local push notifications for tasks that have a due date set.</td></tr>
+        <tr><td><strong>FR-02.2</strong></td><td>The system shall support one-time reminders at a specified date and time.</td></tr>
+        <tr><td><strong>FR-02.3</strong></td><td>The system shall support recurring reminders: daily, weekly, and custom intervals.</td></tr>
+        <tr><td><strong>FR-02.4</strong></td><td>Tapping a notification shall deep-link directly to the relevant task detail screen.</td></tr>
+        <tr><td><strong>FR-02.5</strong></td><td>The system shall reschedule reminders automatically after device reboot via a BroadcastReceiver.</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3 class="sub">FR-03 · Categories</h3>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>ID</th><th>Requirement</th></tr></thead>
+      <tbody>
+        <tr><td><strong>FR-03.1</strong></td><td>Users shall create, rename, and delete custom categories with a colour label.</td></tr>
+        <tr><td><strong>FR-03.2</strong></td><td>Deleting a category shall set associated tasks' category to "Uncategorised", not delete the tasks.</td></tr>
+        <tr><td><strong>FR-03.3</strong></td><td>The home screen shall support filtering the task list by category.</td></tr>
+      </tbody>
+    </table></div>
+
+    <h3 class="sub">FR-04 · Search</h3>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>ID</th><th>Requirement</th></tr></thead>
+      <tbody>
+        <tr><td><strong>FR-04.1</strong></td><td>Search shall query task titles and descriptions using a SQLite FTS5 virtual table.</td></tr>
+        <tr><td><strong>FR-04.2</strong></td><td>Search results shall appear within 200 ms of the last keystroke.</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">NFR — Non-Functional Requirements</div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Category</th><th>Requirement</th><th>Target</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Performance</strong></td><td>App cold-start time on mid-range device</td><td>&lt; 1.5 seconds</td></tr>
+        <tr><td><strong>Performance</strong></td><td>List scroll frame rate</td><td>≥ 60 fps (no jank)</td></tr>
+        <tr><td><strong>Offline</strong></td><td>All features must work with zero network access</td><td>100% offline capable</td></tr>
+        <tr><td><strong>Storage</strong></td><td>APK size (release build, minified)</td><td>&lt; 10 MB</td></tr>
+        <tr><td><strong>Storage</strong></td><td>Data stored locally using Room (SQLite)</td><td>AES-256 encryption at rest</td></tr>
+        <tr><td><strong>Compatibility</strong></td><td>Minimum Android version</td><td>API 26 (Android 8.0)</td></tr>
+        <tr><td><strong>Accessibility</strong></td><td>All interactive elements must have content descriptions</td><td>TalkBack compatible</td></tr>
+        <tr><td><strong>Reliability</strong></td><td>Reminder delivery rate after boot</td><td>≥ 98%</td></tr>
+        <tr><td><strong>Maintainability</strong></td><td>Test code coverage (unit + integration)</td><td>≥ 70%</td></tr>
+        <tr><td><strong>Privacy</strong></td><td>Zero data leaves the device</td><td>No network calls, no analytics SDK</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Permissions Required</div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Permission</th><th>Reason</th></tr></thead>
+      <tbody>
+        <tr><td><code>POST_NOTIFICATIONS</code> (API 33+)</td><td>Display reminder notifications</td></tr>
+        <tr><td><code>SCHEDULE_EXACT_ALARM</code> (API 31+)</td><td>Fire reminders at exact times via AlarmManager</td></tr>
+        <tr><td><code>RECEIVE_BOOT_COMPLETED</code></td><td>Reschedule alarms after device reboot</td></tr>
+        <tr><td><code>VIBRATE</code></td><td>Haptic feedback on notification delivery</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+</section>
+
+<!-- ═══════════ 3. TDD ═══════════ -->
+<section class="doc" id="doc-tdd">
+  <div class="doc-header">
+    <div class="doc-eyebrow"><span class="tag tag-teal">TDD</span><span style="font-size:11px;color:var(--txt-faint)">Technical Design Document</span></div>
+    <div class="doc-title">Plan Well — Technical Design Document</div>
+    <div class="doc-subtitle">Architecture, technology choices, data schema, and implementation patterns.</div>
+    <div class="doc-meta"><span class="meta-item">🏗 MVVM + Clean Architecture</span><span class="meta-item">🗃 Room DB</span><span class="meta-item">🔔 WorkManager + AlarmManager</span></div>
+  </div>
+  <div class="divider"></div>
+
+  <div class="section">
+    <div class="section-title">Architecture Overview</div>
+    <div class="info-box">Pattern: <strong>MVVM (Model-View-ViewModel)</strong> with Clean Architecture layers — UI → ViewModel → UseCase → Repository → DataSource (Room). Single-Activity + Jetpack Navigation Component.</div>
+    <div class="code-block"><span class="c">// Project layer structure</span>
+app/
+├── <span class="t">ui/</span>          <span class="c">// Compose screens, Fragments, ViewModels</span>
+│   ├── home/
+│   ├── task/
+│   ├── reminder/
+│   ├── category/
+│   └── search/
+├── <span class="t">domain/</span>      <span class="c">// UseCases, domain models</span>
+│   ├── model/
+│   └── usecase/
+├── <span class="t">data/</span>         <span class="c">// Repository impls, Room DB, DAOs</span>
+│   ├── local/
+│   │   ├── db/   <span class="c">// AppDatabase, entities</span>
+│   │   └── dao/
+│   └── repository/
+└── <span class="t">di/</span>           <span class="c">// Hilt modules</span></div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Technology Stack</div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Layer</th><th>Technology</th><th>Version</th><th>Why</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Language</strong></td><td>Kotlin</td><td>2.0</td><td>Null-safety, coroutines, idiomatic Android</td></tr>
+        <tr><td><strong>UI</strong></td><td>Jetpack Compose</td><td>1.6.x</td><td>Declarative UI, less boilerplate than XML</td></tr>
+        <tr><td><strong>Navigation</strong></td><td>Navigation Compose</td><td>2.7.x</td><td>Type-safe single-activity navigation</td></tr>
+        <tr><td><strong>Database</strong></td><td>Room</td><td>2.6.x</td><td>SQLite abstraction, FTS5 support, coroutine integration</td></tr>
+        <tr><td><strong>DI</strong></td><td>Hilt</td><td>2.51</td><td>Compile-time DI, Android lifecycle aware</td></tr>
+        <tr><td><strong>Reminders</strong></td><td>AlarmManager + WorkManager</td><td>—</td><td>AlarmManager for exact alarms; WorkManager for recurring / boot-recovery</td></tr>
+        <tr><td><strong>Async</strong></td><td>Kotlin Coroutines + Flow</td><td>1.8.x</td><td>Structured concurrency; LiveData-free reactive streams</td></tr>
+        <tr><td><strong>Serialisation</strong></td><td>Kotlinx Serialization</td><td>1.6.x</td><td>JSON export without reflection</td></tr>
+        <tr><td><strong>Testing</strong></td><td>JUnit5, MockK, Turbine</td><td>latest</td><td>Concise ViewModel/UseCase testing; Flow test support</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Database Schema</div>
+
+    <h3 class="sub">Table: tasks</h3>
+    <div class="schema-table">
+      <div class="schema-header">tasks</div>
+      <div class="schema-row pk"><div class="sc sc-name">id</div><div class="sc sc-type">INTEGER</div><div class="sc sc-note">PRIMARY KEY AUTOINCREMENT</div></div>
+      <div class="schema-row"><div class="sc sc-name">title</div><div class="sc sc-type">TEXT</div><div class="sc sc-note">NOT NULL, max 100 chars</div></div>
+      <div class="schema-row"><div class="sc sc-name">description</div><div class="sc sc-type">TEXT</div><div class="sc sc-note">NULLABLE</div></div>
+      <div class="schema-row"><div class="sc sc-name">due_date_ms</div><div class="sc sc-type">INTEGER</div><div class="sc sc-note">NULLABLE — epoch millis</div></div>
+      <div class="schema-row"><div class="sc sc-name">priority</div><div class="sc sc-type">INTEGER</div><div class="sc sc-note">0=None 1=Low 2=Medium 3=High</div></div>
+      <div class="schema-row"><div class="sc sc-name">category_id</div><div class="sc sc-type">INTEGER</div><div class="sc sc-note">FK → categories.id NULLABLE</div></div>
+      <div class="schema-row"><div class="sc sc-name">is_completed</div><div class="sc sc-type">INTEGER</div><div class="sc sc-note">0 or 1</div></div>
+      <div class="schema-row"><div class="sc sc-name">completed_at_ms</div><div class="sc sc-type">INTEGER</div><div class="sc sc-note">NULLABLE — epoch millis</div></div>
+      <div class="schema-row"><div class="sc sc-name">is_deleted</div><div class="sc sc-type">INTEGER</div><div class="sc sc-note">Soft delete flag</div></div>
+      <div class="schema-row"><div class="sc sc-name">created_at_ms</div><div class="sc sc-type">INTEGER</div><div class="sc sc-note">NOT NULL</div></div>
+      <div class="schema-row"><div class="sc sc-name">updated_at_ms</div><div class="sc sc-type">INTEGER</div><div class="sc sc-note">NOT NULL</div></div>
+    </div>
+
+    <h3 class="sub">Table: reminders</h3>
+    <div class="schema-table">
+      <div class="schema-header">reminders</div>
+      <div class="schema-row pk"><div class="sc sc-name">id</div><div class="sc sc-type">INTEGER</div><div class="sc sc-note">PRIMARY KEY AUTOINCREMENT</div></div>
+      <div class="schema-row"><div class="sc sc-name">task_id</div><div class="sc sc-type">INTEGER</div><div class="sc sc-note">FK → tasks.id NOT NULL</div></div>
+      <div class="schema-row"><div class="sc sc-name">trigger_at_ms</div><div class="sc sc-type">INTEGER</div><div class="sc sc-note">NOT NULL — epoch millis</div></div>
+      <div class="schema-row"><div class="sc sc-name">repeat_type</div><div class="sc sc-type">TEXT</div><div class="sc sc-note">NONE | DAILY | WEEKLY | CUSTOM</div></div>
+      <div class="schema-row"><div class="sc sc-name">repeat_interval_ms</div><div class="sc sc-type">INTEGER</div><div class="sc sc-note">NULLABLE — for CUSTOM type</div></div>
+      <div class="schema-row"><div class="sc sc-name">is_active</div><div class="sc sc-type">INTEGER</div><div class="sc sc-note">1 = scheduled</div></div>
+    </div>
+
+    <h3 class="sub">Table: categories</h3>
+    <div class="schema-table">
+      <div class="schema-header">categories</div>
+      <div class="schema-row pk"><div class="sc sc-name">id</div><div class="sc sc-type">INTEGER</div><div class="sc sc-note">PRIMARY KEY AUTOINCREMENT</div></div>
+      <div class="schema-row"><div class="sc sc-name">name</div><div class="sc sc-type">TEXT</div><div class="sc sc-note">NOT NULL UNIQUE</div></div>
+      <div class="schema-row"><div class="sc sc-name">color_hex</div><div class="sc sc-type">TEXT</div><div class="sc sc-note">e.g. "#2563EB"</div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Reminder Implementation</div>
+    <div class="code-block"><span class="c">// ReminderScheduler.kt — schedules exact alarms</span>
+<span class="k">class</span> <span class="t">ReminderScheduler</span> <span class="n">@Inject</span> <span class="k">constructor</span>(
+    <span class="k">private val</span> context: Context,
+    <span class="k">private val</span> alarmManager: AlarmManager
+) {
+    <span class="k">fun</span> <span class="t">schedule</span>(reminder: Reminder) {
+        <span class="k">val</span> intent = PendingIntent.getBroadcast(
+            context, reminder.id.toInt(),
+            Intent(context, ReminderReceiver::<span class="k">class</span>.java).apply {
+                putExtra(<span class="s">"TASK_ID"</span>, reminder.taskId)
+            },
+            PendingIntent.FLAG_UPDATE_CURRENT <span class="k">or</span> PendingIntent.FLAG_IMMUTABLE
+        )
+        <span class="k">if</span> (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            alarmManager.setExactAndAllowWhileIdle(
+                AlarmManager.RTC_WAKEUP, reminder.triggerAtMs, intent
+            )
+        } <span class="k">else</span> {
+            alarmManager.setExact(AlarmManager.RTC_WAKEUP, reminder.triggerAtMs, intent)
+        }
+    }
+}</span></div>
+    <div class="info-box warn">On Android 12+ (API 31+), the app must request SCHEDULE_EXACT_ALARM permission and check canScheduleExactAlarms() before calling setExactAndAllowWhileIdle. A fallback to setWindow() is used if permission is denied.</div>
+  </div>
+</section>
+
+<!-- ═══════════ 4. UI/UX ═══════════ -->
+<section class="doc" id="doc-uiux">
+  <div class="doc-header">
+    <div class="doc-eyebrow"><span class="tag tag-rose">UI/UX</span><span style="font-size:11px;color:var(--txt-faint)">Design Specifications</span></div>
+    <div class="doc-title">Plan Well — UI/UX Design Specs</div>
+    <div class="doc-subtitle">Logo concept, colour system, typography, component guidelines, and screen wireframes.</div>
+    <div class="doc-meta"><span class="meta-item">🎨 Material Design 3</span><span class="meta-item">📐 Jetpack Compose</span></div>
+  </div>
+  <div class="divider"></div>
+
+  <div class="section">
+    <div class="section-title">Logo Concept</div>
+    <div style="display:flex;align-items:center;gap:20px;flex-wrap:wrap;margin-bottom:12px;">
+      <div style="background:#0F172A;padding:24px 32px;border-radius:16px;display:flex;align-items:center;gap:12px;">
+        <div style="width:52px;height:52px;border-radius:14px;background:linear-gradient(135deg,#2563EB,#10B981);display:flex;align-items:center;justify-content:center;">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="2"/><path d="M9 12l2 2 4-4"/></svg>
+        </div>
+        <div>
+          <div style="color:#fff;font-size:22px;font-weight:800;letter-spacing:-.5px;font-family:'Plus Jakarta Sans',sans-serif;">plan well</div>
+          <div style="color:#64748B;font-size:11px;letter-spacing:.3px;">your personal planner</div>
+        </div>
+      </div>
+      <div>
+        <p style="font-size:13px;max-width:280px;"><strong>Logo Rationale:</strong> The icon uses a checklist with a gradient check-mark — conveying accomplishment and forward motion. Wordmark is lowercase for approachability. Gradient shifts blue → green: planning (deliberate) → growth (results).</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Colour System</div>
+    <div class="palette">
+      <div class="swatch"><div class="swatch-color" style="background:#2563EB;"></div><div class="swatch-label"><div class="swatch-name">Primary</div><div class="swatch-hex">#2563EB</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#1D4ED8;"></div><div class="swatch-label"><div class="swatch-name">Primary Dark</div><div class="swatch-hex">#1D4ED8</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#10B981;"></div><div class="swatch-label"><div class="swatch-name">Accent</div><div class="swatch-hex">#10B981</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#F59E0B;"></div><div class="swatch-label"><div class="swatch-name">Warning</div><div class="swatch-hex">#F59E0B</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#EF4444;"></div><div class="swatch-label"><div class="swatch-name">Danger</div><div class="swatch-hex">#EF4444</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#0F172A;"></div><div class="swatch-label"><div class="swatch-name">Text Primary</div><div class="swatch-hex">#0F172A</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#F8FAFC;"></div><div class="swatch-label"><div class="swatch-name">Background</div><div class="swatch-hex">#F8FAFC</div></div></div>
+      <div class="swatch"><div class="swatch-color" style="background:#FFFFFF;border:1px solid #E2E8F0;"></div><div class="swatch-label"><div class="swatch-name">Surface</div><div class="swatch-hex">#FFFFFF</div></div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Typography</div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Role</th><th>Font</th><th>Weight</th><th>Size (sp)</th><th>Use</th></tr></thead>
+      <tbody>
+        <tr><td>Display</td><td>Roboto</td><td>Bold 700</td><td>24sp</td><td>Screen titles, welcome heading</td></tr>
+        <tr><td>Title</td><td>Roboto</td><td>SemiBold 600</td><td>18sp</td><td>Section headings, card titles</td></tr>
+        <tr><td>Body</td><td>Roboto</td><td>Regular 400</td><td>14sp</td><td>Task descriptions, notes</td></tr>
+        <tr><td>Label</td><td>Roboto</td><td>Medium 500</td><td>12sp</td><td>Chips, badges, timestamps</td></tr>
+        <tr><td>Caption</td><td>Roboto</td><td>Regular 400</td><td>11sp</td><td>Subtitles, helper text</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Screen Wireframes</div>
+    <div class="mockup-grid">
+
+      <!-- Home -->
+      <div class="mockup-frame">
+        <div class="mockup-bar">
+          <div class="screen-title">Today</div>
+          Mon, 28 Sept
+        </div>
+        <div class="mockup-body">
+          <div class="m-search">🔍  Search tasks…</div>
+          <div class="m-category">
+            <div class="m-cat-chip active">All</div>
+            <div class="m-cat-chip">Work</div>
+            <div class="m-cat-chip">Personal</div>
+          </div>
+          <div style="font-size:10px;color:var(--txt-faint);margin-bottom:6px;">3 tasks due today</div>
+          <div class="m-item">
+            <div class="m-item-title">Review project proposal</div>
+            <div class="m-item-sub">🔴 High · 2:00 PM · Work</div>
+          </div>
+          <div class="m-item green">
+            <div class="m-item-title">Buy groceries</div>
+            <div class="m-item-sub">🟡 Medium · 5:00 PM · Personal</div>
+          </div>
+          <div class="m-item amber">
+            <div class="m-item-title">Evening jog</div>
+            <div class="m-item-sub">🟢 Low · 6:30 PM · Health</div>
+          </div>
+          <div class="m-fab">+</div>
+          <div class="m-nav">
+            <div class="m-nav-item active"><div class="m-nav-icon">🏠</div>Home</div>
+            <div class="m-nav-item"><div class="m-nav-icon">📋</div>Tasks</div>
+            <div class="m-nav-item"><div class="m-nav-icon">📅</div>Calendar</div>
+            <div class="m-nav-item"><div class="m-nav-icon">⚙️</div>Settings</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Add Task -->
+      <div class="mockup-frame">
+        <div class="mockup-bar">
+          <div class="screen-title">New Task</div>
+          ← Back
+        </div>
+        <div class="mockup-body">
+          <div style="background:#F1F5F9;border-radius:6px;padding:8px;margin-bottom:6px;font-size:11px;color:var(--txt-muted);">Task title…</div>
+          <div style="background:#F1F5F9;border-radius:6px;padding:8px 8px 20px;margin-bottom:6px;font-size:11px;color:var(--txt-faint);">Description (optional)</div>
+          <div class="m-item" style="border:none;background:#EFF6FF;">
+            <div class="m-item-title" style="color:#2563EB;">📅 Set due date</div>
+          </div>
+          <div class="m-item" style="border:none;background:#ECFDF5;">
+            <div class="m-item-title" style="color:#059669;">🔔 Add reminder</div>
+          </div>
+          <div class="m-item" style="border:none;background:#F8FAFC;">
+            <div class="m-item-title" style="color:var(--txt);">🏷 Category · Priority</div>
+          </div>
+          <div style="background:#2563EB;border-radius:8px;padding:9px;margin-top:8px;text-align:center;font-size:12px;color:white;font-weight:700;">Save Task</div>
+        </div>
+      </div>
+
+      <!-- Reminder -->
+      <div class="mockup-frame">
+        <div class="mockup-bar">
+          <div class="screen-title">Set Reminder</div>
+        </div>
+        <div class="mockup-body">
+          <div style="font-size:10px;color:var(--txt-faint);margin-bottom:6px;">TRIGGER TIME</div>
+          <div style="background:#EFF6FF;border-radius:8px;padding:12px;text-align:center;font-size:18px;font-weight:700;color:#2563EB;margin-bottom:8px;">2 : 00 PM</div>
+          <div style="font-size:10px;color:var(--txt-faint);margin-bottom:6px;">REPEAT</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:4px;margin-bottom:8px;">
+            <div style="background:#2563EB;color:white;border-radius:6px;padding:6px;text-align:center;font-size:10px;font-weight:700;">Once</div>
+            <div style="background:#F1F5F9;color:var(--txt-muted);border-radius:6px;padding:6px;text-align:center;font-size:10px;">Daily</div>
+            <div style="background:#F1F5F9;color:var(--txt-muted);border-radius:6px;padding:6px;text-align:center;font-size:10px;">Weekly</div>
+            <div style="background:#F1F5F9;color:var(--txt-muted);border-radius:6px;padding:6px;text-align:center;font-size:10px;">Custom</div>
+          </div>
+          <div style="background:#10B981;border-radius:8px;padding:9px;text-align:center;font-size:12px;color:white;font-weight:700;margin-top:6px;">Confirm Reminder</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Component Guidelines</div>
+    <ul class="doc-list">
+      <li><strong>Corner Radius:</strong> Cards 12dp, Buttons 8dp, Chips 16dp (pill)</li>
+      <li><strong>Elevation:</strong> Cards 1dp (subtle shadow). No heavy shadows.</li>
+      <li><strong>FAB:</strong> Primary colour, bottom-right, 56dp, for primary action (Add Task).</li>
+      <li><strong>Priority colours:</strong> High → #EF4444, Medium → #F59E0B, Low → #10B981, None → #94A3B8</li>
+      <li><strong>Dark Mode:</strong> Supported via MaterialTheme.colorScheme. Background → #0F172A, Surface → #1E293B.</li>
+      <li><strong>Empty States:</strong> Illustrated SVG + action CTA. Never just a blank screen.</li>
+      <li><strong>Transitions:</strong> Shared element transition between list → detail only. No gratuitous animation.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- ═══════════ 5. ROADMAP ═══════════ -->
+<section class="doc" id="doc-roadmap">
+  <div class="doc-header">
+    <div class="doc-eyebrow"><span class="tag tag-amber">ROADMAP</span><span style="font-size:11px;color:var(--txt-faint)">Project Plan</span></div>
+    <div class="doc-title">Plan Well — Project Plan & Roadmap</div>
+    <div class="doc-subtitle">Phased implementation timeline, milestones, and delivery targets.</div>
+    <div class="doc-meta"><span class="meta-item">⏱ Total Duration: ~9 weeks</span><span class="meta-item">👤 Solo Developer</span></div>
+  </div>
+  <div class="divider"></div>
+
+  <div class="section">
+    <div class="section-title">Phases & Milestones</div>
+    <div class="timeline">
+
+      <div class="tl-item">
+        <div class="tl-dot done"></div>
+        <div class="tl-phase">Phase 0 · Week 1</div>
+        <div class="tl-title">Project Setup & Architecture</div>
+        <div class="tl-body">
+          <ul class="doc-list">
+            <li>Initialise Kotlin + Jetpack Compose project in Android Studio</li>
+            <li>Configure Hilt, Room, Navigation Component, Coroutines/Flow</li>
+            <li>Set up module structure (ui, domain, data, di)</li>
+            <li>Create base AppDatabase with Room migration scaffold</li>
+            <li>Set up CI (GitHub Actions) for lint + unit tests</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-phase">Phase 1 · Weeks 2–3</div>
+        <div class="tl-title">Core Task CRUD</div>
+        <div class="tl-body">
+          <ul class="doc-list">
+            <li>Task entity, DAO, Repository, and UseCases</li>
+            <li>Home screen (task list) + Add/Edit/Delete Task screens</li>
+            <li>Priority selection component, due-date picker</li>
+            <li>Soft delete + Trash screen</li>
+            <li>Mark complete with animation</li>
+          </ul>
+          <div style="margin-top:8px;"><span class="pill pill-green">Milestone: Core task management working end-to-end</span></div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-phase">Phase 2 · Weeks 4–5</div>
+        <div class="tl-title">Reminders & Notifications</div>
+        <div class="tl-body">
+          <ul class="doc-list">
+            <li>Reminder entity + DAO</li>
+            <li>ReminderScheduler (AlarmManager, exact alarms)</li>
+            <li>ReminderReceiver (BroadcastReceiver) + BootReceiver</li>
+            <li>NotificationBuilder — styled notification with deep link</li>
+            <li>Reminder UI: time picker, repeat selector</li>
+            <li>Permission handling (POST_NOTIFICATIONS, SCHEDULE_EXACT_ALARM)</li>
+          </ul>
+          <div style="margin-top:8px;"><span class="pill pill-green">Milestone: Reminders fire reliably, survive reboot</span></div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot"></div>
+        <div class="tl-phase">Phase 3 · Week 6</div>
+        <div class="tl-title">Categories, Search & Dashboard</div>
+        <div class="tl-body">
+          <ul class="doc-list">
+            <li>Category management screen</li>
+            <li>FTS5 virtual table for full-text task search</li>
+            <li>Search screen with debounced query</li>
+            <li>Dashboard: today view, completion ring, stats</li>
+          </ul>
+          <div style="margin-top:8px;"><span class="pill pill-green">Milestone: App feature-complete for v1.0</span></div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot warn"></div>
+        <div class="tl-phase">Phase 4 · Weeks 7–8</div>
+        <div class="tl-title">Testing, Polish & Dark Mode</div>
+        <div class="tl-body">
+          <ul class="doc-list">
+            <li>Unit tests: ViewModels, UseCases, Repository (MockK)</li>
+            <li>Integration tests: Room in-memory DB</li>
+            <li>Compose UI tests (key user flows)</li>
+            <li>Dark Mode implementation + QA</li>
+            <li>Accessibility audit (TalkBack testing)</li>
+            <li>Performance profiling (cold start, scroll jank)</li>
+            <li>Data export (JSON) feature</li>
+          </ul>
+          <div style="margin-top:8px;"><span class="pill pill-amber">Milestone: ≥70% test coverage, no P0/P1 bugs</span></div>
+        </div>
+      </div>
+
+      <div class="tl-item">
+        <div class="tl-dot warn"></div>
+        <div class="tl-phase">Phase 5 · Week 9</div>
+        <div class="tl-title">Release Prep & Play Store Submission</div>
+        <div class="tl-body">
+          <ul class="doc-list">
+            <li>ProGuard/R8 rules + release build testing</li>
+            <li>Play Store listing: screenshots, description, privacy policy</li>
+            <li>Internal test track → Closed testing → Production</li>
+            <li>v1.0.0 release notes drafted</li>
+          </ul>
+          <div style="margin-top:8px;"><span class="pill pill-blue">Milestone: v1.0.0 Live on Play Store</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Post-Launch Backlog (v1.1+)</div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Feature</th><th>Estimated Effort</th><th>Target Version</th></tr></thead>
+      <tbody>
+        <tr><td>Home screen widget</td><td>1 week</td><td>v1.1</td></tr>
+        <tr><td>CSV/JSON data export & import</td><td>3 days</td><td>v1.1</td></tr>
+        <tr><td>Task sub-tasks (checklist)</td><td>1 week</td><td>v1.2</td></tr>
+        <tr><td>Calendar / agenda view</td><td>2 weeks</td><td>v1.2</td></tr>
+        <tr><td>Tablet / large-screen layout</td><td>1 week</td><td>v1.3</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+</section>
+
+<!-- ═══════════ 6. TEST PLAN ═══════════ -->
+<section class="doc" id="doc-testplan">
+  <div class="doc-header">
+    <div class="doc-eyebrow"><span class="tag tag-green">QA</span><span style="font-size:11px;color:var(--txt-faint)">Test Plan & QA Documentation</span></div>
+    <div class="doc-title">Plan Well — Test Plan</div>
+    <div class="doc-subtitle">Testing strategy, coverage targets, tools, and acceptance criteria.</div>
+    <div class="doc-meta"><span class="meta-item">🧪 JUnit5 + MockK + Turbine</span><span class="meta-item">📱 Espresso + Compose Test</span></div>
+  </div>
+  <div class="divider"></div>
+
+  <div class="section">
+    <div class="section-title">Testing Pyramid</div>
+    <div class="card-grid">
+      <div class="card"><div class="card-icon">⚡</div><div class="card-label">Unit Tests (70%)</div><div class="card-desc">ViewModels, UseCases, Repository logic, ReminderScheduler. Run in JVM. Fast, no Android deps.</div></div>
+      <div class="card"><div class="card-icon">🔗</div><div class="card-label">Integration Tests (20%)</div><div class="card-desc">Room DAOs with in-memory database. WorkManager integration. Run on device/emulator.</div></div>
+      <div class="card"><div class="card-icon">📱</div><div class="card-label">UI / E2E Tests (10%)</div><div class="card-desc">Key user flows with Compose Test + Espresso. Create task, complete, set reminder.</div></div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Unit Test Coverage Plan</div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Component</th><th>Test Cases</th><th>Tool</th></tr></thead>
+      <tbody>
+        <tr><td><strong>TaskViewModel</strong></td><td>Insert task → uiState contains task; Delete task → removed from list; Mark complete → is_completed=true; Filter by category → correct subset returned</td><td>JUnit5, MockK, Turbine</td></tr>
+        <tr><td><strong>CreateTaskUseCase</strong></td><td>Blank title → throws ValidationException; Title > 100 chars → throws; Valid task → returns saved entity</td><td>JUnit5, MockK</td></tr>
+        <tr><td><strong>ReminderScheduler</strong></td><td>schedule() calls AlarmManager.setExactAndAllowWhileIdle with correct time; cancel() calls cancel on PendingIntent</td><td>JUnit5, MockK</td></tr>
+        <tr><td><strong>SearchUseCase</strong></td><td>Empty query → empty result; Valid query → FTS results ordered by relevance; Special chars → handled gracefully</td><td>JUnit5, MockK</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Integration Tests</div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Test</th><th>Scenario</th><th>Expected</th></tr></thead>
+      <tbody>
+        <tr><td><strong>TaskDao_InsertAndQuery</strong></td><td>Insert task → query by ID</td><td>Returned entity matches inserted data</td></tr>
+        <tr><td><strong>TaskDao_SoftDelete</strong></td><td>Soft-delete a task → query active tasks</td><td>Deleted task not in result; visible in trash query</td></tr>
+        <tr><td><strong>ReminderDao_Cascade</strong></td><td>Delete parent task → reminders cascade delete</td><td>No orphan reminders in DB</td></tr>
+        <tr><td><strong>FTS_Search</strong></td><td>Insert 3 tasks, search for term in task 2 title</td><td>Returns only task 2</td></tr>
+        <tr><td><strong>CategoryDao_NullifyOnDelete</strong></td><td>Delete category, query associated tasks</td><td>Tasks have category_id = NULL</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">UAT Scenarios (Manual)</div>
+    <ul class="checklist">
+      <li><div class="check"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>User creates a task with title, due date, and high priority — task appears at top of today's list.</li>
+      <li><div class="check"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>User sets a reminder 5 minutes in the future — notification fires on time and tapping it opens the task.</li>
+      <li><div class="check"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>Device is rebooted after reminder is set — reminder fires correctly after reboot.</li>
+      <li><div class="check"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>User marks a task complete — task moves to completed section, progress ring updates.</li>
+      <li><div class="check"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>User searches "grocery" — correct task appears within 200 ms.</li>
+      <li><div class="check"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>All flows work with no internet connection (airplane mode).</li>
+      <li><div class="check"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>App works correctly with TalkBack enabled — all elements are accessible.</li>
+      <li><div class="check"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div>Cold start on mid-range device completes in under 1.5 seconds.</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Coverage Target</div>
+    <div class="info-box success">Minimum 70% line coverage measured by JaCoCo. The domain/ and data/repository/ layers target ≥ 85%. UI layer (Composables) is not counted toward the 70% floor.</div>
+  </div>
+</section>
+
+<!-- ═══════════ 7. DEPLOYMENT ═══════════ -->
+<section class="doc" id="doc-deploy">
+  <div class="doc-header">
+    <div class="doc-eyebrow"><span class="tag tag-slate">DEPLOY</span><span style="font-size:11px;color:var(--txt-faint)">Deployment & Release Notes</span></div>
+    <div class="doc-title">Plan Well — Deployment Guide</div>
+    <div class="doc-subtitle">Play Store publishing checklist, versioning strategy, ProGuard configuration, and v1.0.0 release notes.</div>
+    <div class="doc-meta"><span class="meta-item">🏪 Google Play Store</span><span class="meta-item">🔏 Release build + R8/ProGuard</span></div>
+  </div>
+  <div class="divider"></div>
+
+  <div class="section">
+    <div class="section-title">Versioning Strategy</div>
+    <p>Plan Well uses <strong>Semantic Versioning</strong>: <code>MAJOR.MINOR.PATCH</code>. The <code>versionCode</code> in <code>build.gradle.kts</code> is an auto-incrementing integer for Play Store ordering.</p>
+    <div class="code-block"><span class="c">// build.gradle.kts (app)</span>
+android {
+    defaultConfig {
+        applicationId = <span class="s">"com.planwell.app"</span>
+        minSdk = <span class="t">26</span>
+        targetSdk = <span class="t">35</span>
+        versionCode = <span class="t">1</span>          <span class="c">// Increment on every Play Store release</span>
+        versionName = <span class="s">"1.0.0"</span>    <span class="c">// MAJOR.MINOR.PATCH</span>
+    }
+    buildTypes {
+        release {
+            isMinifyEnabled = <span class="k">true</span>
+            isShrinkResources = <span class="k">true</span>
+            proguardFiles(getDefaultProguardFile(<span class="s">"proguard-android-optimize.txt"</span>), <span class="s">"proguard-rules.pro"</span>)
+        }
+    }
+}</div>
+    <div style="margin-top:10px;">
+      <div class="ver-badge"><span class="ver-dot" style="background:#10B981;"></span>v1.0.0 — Initial release (this document)</div>
+      <div class="ver-badge"><span class="ver-dot" style="background:#94A3B8;"></span>v1.1.0 — Widget + export (planned)</div>
+      <div class="ver-badge"><span class="ver-dot" style="background:#94A3B8;"></span>v1.2.0 — Sub-tasks + calendar (planned)</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">ProGuard Rules</div>
+    <div class="code-block"><span class="c"># proguard-rules.pro</span>
+
+<span class="c"># Room — keep entity and DAO classes</span>
+<span class="k">-keep</span> class com.planwell.app.data.local.** { *; }
+
+<span class="c"># Hilt — generated components</span>
+<span class="k">-keep</span> class dagger.hilt.** { *; }
+<span class="k">-dontwarn</span> dagger.hilt.**
+
+<span class="c"># Kotlinx Serialization</span>
+<span class="k">-keepattributes</span> *Annotation*, InnerClasses
+<span class="k">-dontnote</span> kotlinx.serialization.AnnotationsKt
+
+<span class="c"># Keep WorkManager workers</span>
+<span class="k">-keep</span> class com.planwell.app.data.worker.** extends androidx.work.Worker { *; }</div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Play Store Submission Checklist</div>
+    <ul class="checklist">
+      <li><div class="check"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div><strong>Signing:</strong> Release APK/AAB signed with a production keystore (not debug). Keystore stored securely — <strong>never in version control</strong>.</li>
+      <li><div class="check"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div><strong>Build format:</strong> Android App Bundle (.aab) for Play Store (not APK) to enable dynamic delivery and smaller download size.</li>
+      <li><div class="check"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div><strong>Screenshots:</strong> Minimum 2 phone screenshots (1080×1920 or 1440×2560). Optional: 7-inch tablet screenshots.</li>
+      <li><div class="check"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div><strong>App icon:</strong> 512×512 PNG (no transparency) for Play Store listing. Adaptive icon configured in AndroidManifest.</li>
+      <li><div class="check"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div><strong>Privacy Policy:</strong> Required even for offline apps. Host a simple page explaining no data leaves the device. Link in Play Console.</li>
+      <li><div class="check"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div><strong>Data Safety form:</strong> In Play Console → complete Data Safety section. Plan Well collects no data; mark all fields as "No data collected."</li>
+      <li><div class="check"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div><strong>Content rating:</strong> Complete the IARC questionnaire. Plan Well targets "Everyone."</li>
+      <li><div class="check"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div><strong>Internal testing:</strong> Upload to Internal test track → test on 2+ real devices → promote to Closed testing → Production.</li>
+      <li><div class="check"><svg viewBox="0 0 12 12"><polyline points="2,6 5,9 10,3"/></svg></div><strong>Release notes:</strong> Provide short, user-friendly "What's new" text for v1.0.0 (see below).</li>
+    </ul>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Release Notes — v1.0.0</div>
+    <div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:18px;">
+      <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;">
+        <span style="font-size:20px;">🎉</span>
+        <div>
+          <div style="font-size:15px;font-weight:700;color:var(--txt);">Plan Well v1.0.0 — Initial Release</div>
+          <div style="font-size:11px;color:var(--txt-faint);">September 2025</div>
+        </div>
+      </div>
+      <p style="font-size:13px;line-height:1.7;">Welcome to Plan Well — your simple, private, offline-first personal planner.</p>
+      <h4 class="mini">✅ What's included in v1.0.0</h4>
+      <ul class="doc-list">
+        <li>Create and manage tasks with priorities, due dates, and descriptions</li>
+        <li>Set one-time and recurring reminders (daily, weekly) — works even after reboot</li>
+        <li>Organise tasks into colour-coded categories</li>
+        <li>Today dashboard showing your daily plan and progress</li>
+        <li>Full-text search across all your tasks</li>
+        <li>Dark Mode support</li>
+        <li>100% offline — your data never leaves your device</li>
+      </ul>
+      <div class="info-box success" style="margin-top:12px;">No account needed. No internet required. No data collected. Just you and your plans.</div>
+    </div>
+  </div>
+
+  <div class="section">
+    <div class="section-title">Rollout Strategy</div>
+    <div class="tbl-wrap"><table>
+      <thead><tr><th>Stage</th><th>Track</th><th>Audience</th><th>Duration</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>Internal Testing</td><td>Dev + 5 testers</td><td>3 days</td></tr>
+        <tr><td>2</td><td>Closed Testing (Alpha)</td><td>20–50 users</td><td>5 days</td></tr>
+        <tr><td>3</td><td>Production (20% rollout)</td><td>20% of new users</td><td>3 days — monitor ANR/crash rate</td></tr>
+        <tr><td>4</td><td>Production (100%)</td><td>All users</td><td>Full rollout if no regressions</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+</section>
+
+</main>
+
+<script>
+function show(docId, el) {
+  document.querySelectorAll('.doc').forEach(d => d.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  document.getElementById('doc-' + docId).classList.add('active');
+  el.classList.add('active');
+  window.scrollTo({top: 0, behavior: 'smooth'});
+}
+</script>
+</body>
+</html>

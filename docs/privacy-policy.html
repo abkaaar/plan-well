@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Plan Well — Privacy Policy</title>
+  <style>
+    :root {
+      --bg: #f8fafc;
+      --text: #0f172a;
+      --muted: #64748b;
+      --accent: #2563eb;
+    }
+    body {
+      margin: 0;
+      font-family: "Segoe UI", system-ui, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+    main {
+      max-width: 40rem;
+      margin: 0 auto;
+      padding: 2.5rem 1.25rem 4rem;
+    }
+    h1 { font-size: 1.75rem; margin-bottom: 0.25rem; }
+    .meta { color: var(--muted); font-size: 0.95rem; margin-bottom: 2rem; }
+    h2 { font-size: 1.15rem; margin-top: 1.75rem; color: var(--accent); }
+    ul { padding-left: 1.25rem; }
+    a { color: var(--accent); }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Privacy Policy</h1>
+    <p class="meta">Plan Well · Effective date: 29 September 2026 · Last updated: 29 September 2026</p>
+
+    <p>
+      Plan Well (“the App”) is an offline-first personal task planner.
+      This policy explains how the App handles information.
+    </p>
+
+    <h2>No data collection</h2>
+    <p>
+      The App does <strong>not</strong> collect, transmit, sell, or share personal data.
+      There is no account system, no analytics SDK, and no advertising identifier tracking.
+    </p>
+
+    <h2>No internet access</h2>
+    <p>
+      The App does not request the <code>INTERNET</code> permission.
+      It does not contact remote servers. All features work without a network connection.
+    </p>
+
+    <h2>Data stored on your device</h2>
+    <p>
+      Tasks, categories, and reminders you create are stored only in a local database on your device
+      (SQLite via Android Room). Reminder schedules use the device’s AlarmManager / WorkManager.
+      This data never leaves your device unless <em>you</em> explicitly export it
+      (for example, the optional JSON export to Downloads).
+    </p>
+
+    <h2>Permissions</h2>
+    <ul>
+      <li><strong>Notifications</strong> — to show reminder alerts you configure.</li>
+      <li><strong>Exact alarms</strong> (Android 12+) — to fire reminders at the times you set.</li>
+      <li><strong>Boot completed</strong> — to restore scheduled reminders after a device reboot.</li>
+    </ul>
+    <p>These permissions are used only for local reminder functionality.</p>
+
+    <h2>Children</h2>
+    <p>
+      The App does not knowingly collect data from children. It is suitable for a general audience
+      and does not include social features or ads.
+    </p>
+
+    <h2>Changes</h2>
+    <p>
+      If this policy changes, the “Last updated” date above will be revised.
+      Continued use of the App after an update constitutes acceptance of the revised policy.
+    </p>
+
+    <h2>Contact</h2>
+    <p>
+      Questions about this policy:
+      <a href="mailto:abkaaar2@gmail.com">privacy@planwell.app</a>
+      (replace with your real developer contact email before publishing).
+    </p>
+  </main>
+</body>
+</html>
