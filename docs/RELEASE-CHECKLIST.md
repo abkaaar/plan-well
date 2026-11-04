@@ -8,9 +8,10 @@ Use this alongside [play-store-listing.md](play-store-listing.md) and [privacy-p
 - [x] Release minify + shrink + ProGuard rules
 - [x] Conditional release signing (`local.properties` / env)
 - [x] Keystore instructions (`keystore/README.md`)
-- [x] Privacy policy HTML
+- [x] Privacy policy HTML (updated for opportunities / OCR — Oct 2026)
 - [x] Play listing copy + Data Safety guidance
 - [x] Store asset placeholders (`docs/store-assets/`)
+- [x] Pre-release validation report — see [RELEASE-VALIDATION.md](RELEASE-VALIDATION.md)
 
 ## You must do (outside the repo)
 

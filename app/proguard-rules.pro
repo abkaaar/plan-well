@@ -43,3 +43,8 @@
 -keep class com.planwell.app.data.alarm.** { *; }
 -keep class com.planwell.app.data.worker.** { *; }
 -keep class com.planwell.app.PlanWellApplication { *; }
+
+# ML Kit text recognition (on-device OCR)
+-keep class com.google.mlkit.** { *; }
+-dontwarn com.google.mlkit.**
+-dontwarn com.google.android.gms.**

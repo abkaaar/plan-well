@@ -5,6 +5,7 @@ import androidx.hilt.work.HiltWorker
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
 import com.planwell.app.data.alarm.ReminderScheduler
+import com.planwell.app.domain.repository.CallRepository
 import com.planwell.app.domain.repository.ReminderRepository
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedInject
@@ -14,6 +15,7 @@ class RestoreRemindersWorker @AssistedInject constructor(
     @Assisted context: Context,
     @Assisted params: WorkerParameters,
     private val reminderRepository: ReminderRepository,
+    private val callRepository: CallRepository,
     private val reminderScheduler: ReminderScheduler,
 ) : CoroutineWorker(context, params) {
 
@@ -22,6 +24,8 @@ class RestoreRemindersWorker @AssistedInject constructor(
         reminderRepository.getAllActiveReminders()
             .filter { it.triggerAtMs > now }
             .forEach { reminderScheduler.schedule(it) }
+        callRepository.getPending(now)
+            .forEach { reminderScheduler.scheduleCall(it) }
         return Result.success()
     }
 }

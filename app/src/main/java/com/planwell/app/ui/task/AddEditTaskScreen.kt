@@ -63,7 +63,7 @@ fun AddEditTaskScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(if (uiState.isEditing) "Edit task" else "New task")
+                    Text(uiState.screenTitle)
                 },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
@@ -134,7 +134,10 @@ fun AddEditTaskScreen(
                     )
                 }
             }
-            Text("Due date", style = MaterialTheme.typography.titleMedium)
+            Text(
+                if (uiState.requiresDueDate) "Due (required)" else "Due",
+                style = MaterialTheme.typography.titleMedium,
+            )
             Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
                 OutlinedButton(
                     onClick = {

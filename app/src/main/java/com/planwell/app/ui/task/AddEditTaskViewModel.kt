@@ -20,6 +20,12 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+enum class TaskCreatePreset {
+    NONE,
+    CALL,
+    EVENT,
+}
+
 data class AddEditTaskUiState(
     val taskId: Long = 0,
     val title: String = "",
@@ -28,6 +34,9 @@ data class AddEditTaskUiState(
     val priority: Priority = Priority.NONE,
     val categoryId: Long? = null,
     val categories: List<Category> = emptyList(),
+    val preset: TaskCreatePreset = TaskCreatePreset.NONE,
+    val requiresDueDate: Boolean = false,
+    val screenTitle: String = "New task",
     val isEditing: Boolean = false,
     val isSaving: Boolean = false,
     val error: String? = null,
@@ -44,9 +53,31 @@ class AddEditTaskViewModel @Inject constructor(
 ) : ViewModel() {
 
     private val taskId: Long = savedStateHandle.get<Long>("taskId") ?: 0L
+    private val preset: TaskCreatePreset =
+        when (savedStateHandle.get<String>("preset")?.lowercase()) {
+            "call" -> TaskCreatePreset.CALL
+            "event" -> TaskCreatePreset.EVENT
+            else -> TaskCreatePreset.NONE
+        }
 
     private val form = MutableStateFlow(
-        AddEditTaskUiState(taskId = taskId, isEditing = taskId > 0),
+        AddEditTaskUiState(
+            taskId = taskId,
+            isEditing = taskId > 0,
+            preset = preset,
+            requiresDueDate = preset == TaskCreatePreset.CALL || preset == TaskCreatePreset.EVENT,
+            title = when (preset) {
+                TaskCreatePreset.CALL -> "Call "
+                TaskCreatePreset.EVENT -> "Event "
+                TaskCreatePreset.NONE -> ""
+            },
+            screenTitle = when {
+                taskId > 0 -> "Edit task"
+                preset == TaskCreatePreset.CALL -> "Schedule a call"
+                preset == TaskCreatePreset.EVENT -> "Add event"
+                else -> "New task"
+            },
+        ),
     )
 
     val uiState: StateFlow<AddEditTaskUiState> =
@@ -70,6 +101,8 @@ class AddEditTaskViewModel @Inject constructor(
                                 dueDateMs = task.dueDateMs,
                                 priority = task.priority,
                                 categoryId = task.categoryId,
+                                requiresDueDate = false,
+                                screenTitle = "Edit task",
                             )
                         }
                     }
@@ -87,7 +120,7 @@ class AddEditTaskViewModel @Inject constructor(
     }
 
     fun onDueDateChange(value: Long?) {
-        form.update { it.copy(dueDateMs = value) }
+        form.update { it.copy(dueDateMs = value, error = null) }
     }
 
     fun onPriorityChange(value: Priority) {
@@ -104,12 +137,24 @@ class AddEditTaskViewModel @Inject constructor(
             form.update { it.copy(error = "Title is required") }
             return
         }
+        if (state.requiresDueDate && state.dueDateMs == null) {
+            form.update {
+                it.copy(
+                    error = when (state.preset) {
+                        TaskCreatePreset.CALL -> "Pick a date and time for the call"
+                        TaskCreatePreset.EVENT -> "Pick a date and time for the event"
+                        else -> "Due date is required"
+                    },
+                )
+            }
+            return
+        }
         viewModelScope.launch {
             form.update { it.copy(isSaving = true, error = null) }
             try {
                 val task = Task(
                     id = state.taskId,
-                    title = state.title,
+                    title = state.title.trim(),
                     description = state.description.ifBlank { null },
                     dueDateMs = state.dueDateMs,
                     priority = state.priority,

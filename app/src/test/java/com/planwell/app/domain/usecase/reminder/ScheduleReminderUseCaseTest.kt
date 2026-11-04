@@ -52,6 +52,7 @@ class ScheduleReminderUseCaseTest {
 
     @Test
     fun futureReminderSchedules() = runTest {
+        coEvery { repository.getActiveRemindersForTask(3L) } returns emptyList()
         coEvery { repository.scheduleReminder(any()) } returns 9L
         val trigger = System.currentTimeMillis() + 120_000
 
@@ -61,5 +62,22 @@ class ScheduleReminderUseCaseTest {
 
         assertEquals(9L, id)
         coVerify { repository.scheduleReminder(match { it.taskId == 3L && it.triggerAtMs == trigger }) }
+    }
+
+    @Test
+    fun nearbyExistingReminderIsUpdatedNotDuplicated() = runTest {
+        val trigger = System.currentTimeMillis() + 120_000
+        coEvery { repository.getActiveRemindersForTask(3L) } returns listOf(
+            Reminder(id = 4L, taskId = 3L, triggerAtMs = trigger + 10_000L),
+        )
+        coEvery { repository.updateReminder(any()) } returns Unit
+
+        val id = useCase(
+            Reminder(taskId = 3L, triggerAtMs = trigger, repeatType = RepeatType.NONE),
+        )
+
+        assertEquals(4L, id)
+        coVerify { repository.updateReminder(match { it.id == 4L && it.triggerAtMs == trigger }) }
+        coVerify(exactly = 0) { repository.scheduleReminder(any()) }
     }
 }

@@ -9,6 +9,7 @@ import com.planwell.app.domain.model.Task
 import com.planwell.app.domain.repository.TaskRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -41,6 +42,20 @@ class TaskRepositoryImpl @Inject constructor(
 
     override suspend fun getTask(id: Long): Task? =
         taskDao.getTaskById(id)?.toDomain()
+
+    override fun observeTasksByIds(ids: List<Long>): Flow<List<Task>> {
+        if (ids.isEmpty()) return flowOf(emptyList())
+        return taskDao.observeByIds(ids).map { list ->
+            val byId = list.associateBy { it.id }
+            ids.mapNotNull { id -> byId[id]?.toDomain() }
+        }
+    }
+
+    override suspend fun getTasksByIds(ids: List<Long>): List<Task> {
+        if (ids.isEmpty()) return emptyList()
+        val byId = taskDao.getByIds(ids).associateBy { it.id }
+        return ids.mapNotNull { id -> byId[id]?.toDomain() }
+    }
 
     override suspend fun createTask(task: Task): Long =
         taskDao.insertTask(task.copy(id = 0).toEntity())

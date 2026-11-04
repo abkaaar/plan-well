@@ -1,4 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="app_name">Plan Well</string>
+    <string name="share_to_plan_well">Save to Plan Well</string>
+    <string name="call_contacts_rationale_title">Access contacts</string>
+    <string name="call_contacts_rationale_message">Plan Well uses your contacts so you can pick who to call. You can still type a number manually if you skip this.</string>
+    <string name="call_contacts_rationale_allow">Allow</string>
+    <string name="call_contacts_rationale_skip">Type number instead</string>
+    <string name="call_now">Call now</string>
+    <string name="snooze_15m">Snooze 15m</string>
+    <string name="scheduled_call">Scheduled call</string>
 </resources>
+

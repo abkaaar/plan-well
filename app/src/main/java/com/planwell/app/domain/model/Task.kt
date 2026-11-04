@@ -24,4 +24,7 @@ data class Task(
     val isDeleted: Boolean = false,
     val createdAtMs: Long = System.currentTimeMillis(),
     val updatedAtMs: Long = System.currentTimeMillis(),
+    val sourceType: String? = null,
+    val sourceImagePath: String? = null,
+    val sourceUrl: String? = null,
 )

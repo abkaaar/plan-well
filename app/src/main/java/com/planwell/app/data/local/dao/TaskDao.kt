@@ -108,4 +108,10 @@ interface TaskDao {
         """,
     )
     fun observeTodayCompleted(startMs: Long, endMs: Long): Flow<Int>
+
+    @Query("SELECT * FROM tasks WHERE id IN (:ids)")
+    fun observeByIds(ids: List<Long>): Flow<List<TaskEntity>>
+
+    @Query("SELECT * FROM tasks WHERE id IN (:ids)")
+    suspend fun getByIds(ids: List<Long>): List<TaskEntity>
 }

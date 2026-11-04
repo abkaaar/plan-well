@@ -3,6 +3,7 @@ package com.planwell.app.ui.home
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,19 +18,19 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.outlined.DeleteOutline
-import androidx.compose.material.icons.outlined.Label
+import androidx.compose.material.icons.outlined.Inbox
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -38,6 +39,7 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
+import androidx.compose.material3.SuggestionChip
 import androidx.compose.material3.SwipeToDismissBox
 import androidx.compose.material3.SwipeToDismissBoxValue
 import androidx.compose.material3.Text
@@ -57,13 +59,20 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.planwell.app.domain.agenda.AgendaItem
+import com.planwell.app.domain.agenda.AgendaItemKind
+import com.planwell.app.domain.agenda.AgendaSection
 import com.planwell.app.domain.model.CompletionStats
 import com.planwell.app.domain.model.Task
 import com.planwell.app.ui.category.parseHexColor
 import com.planwell.app.ui.components.EmptyState
+import com.planwell.app.ui.components.ExpandableHomeFab
+import com.planwell.app.ui.components.HomeFabAction
 import com.planwell.app.ui.components.TaskCard
+import com.planwell.app.ui.opportunity.CaptureOpportunitySheet
 import com.planwell.app.ui.theme.AccentGreen
 import com.planwell.app.ui.theme.DangerRed
+import com.planwell.app.ui.theme.WarningAmber
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -72,18 +81,28 @@ import java.util.Locale
 @Composable
 fun HomeScreen(
     onAddTask: () -> Unit,
+    onScheduleCall: () -> Unit,
+    onAddEvent: () -> Unit,
     onOpenTask: (Long) -> Unit,
     onOpenTrash: () -> Unit,
     onOpenSearch: () -> Unit,
     onOpenCategories: () -> Unit,
+    onOpenSettings: () -> Unit,
+    onOpenInbox: () -> Unit,
+    onAddOpportunityManual: () -> Unit,
+    onOpenOpportunity: (Long) -> Unit,
+    onOpenExtraction: (Long) -> Unit,
+    snackbarHostState: SnackbarHostState = remember { SnackbarHostState() },
     viewModel: HomeViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val snackbarHostState = remember { SnackbarHostState() }
     var menuExpanded by remember { mutableStateOf(false) }
+    var showCaptureSheet by remember { mutableStateOf(false) }
+    var fabExpanded by remember { mutableStateOf(false) }
     val todayLabel = remember {
         SimpleDateFormat("EEEE, d MMM", Locale.getDefault()).format(Date())
     }
+    val timeFormat = remember { SimpleDateFormat("h:mm a", Locale.getDefault()) }
 
     LaunchedEffect(Unit) {
         viewModel.events.collect { event ->
@@ -119,28 +138,46 @@ fun HomeScreen(
                     }
                 },
                 actions = {
+                    IconButton(onClick = onOpenInbox) {
+                        Icon(Icons.Outlined.Inbox, contentDescription = "Inbox")
+                    }
                     IconButton(onClick = onOpenSearch) {
                         Icon(Icons.Filled.Search, contentDescription = "Search")
                     }
-                    IconButton(onClick = onOpenCategories) {
-                        Icon(Icons.Outlined.Label, contentDescription = "Categories")
-                    }
-                    IconButton(onClick = onOpenTrash) {
-                        Icon(Icons.Outlined.DeleteOutline, contentDescription = "Trash")
-                    }
                     Box {
                         IconButton(onClick = { menuExpanded = true }) {
-                            Icon(Icons.Filled.MoreVert, contentDescription = "More options")
+                            Icon(Icons.Filled.MoreVert, contentDescription = "More")
                         }
                         DropdownMenu(
                             expanded = menuExpanded,
                             onDismissRequest = { menuExpanded = false },
                         ) {
                             DropdownMenuItem(
-                                text = { Text("Export tasks (JSON)") },
+                                text = { Text("Categories") },
+                                onClick = {
+                                    menuExpanded = false
+                                    onOpenCategories()
+                                },
+                            )
+                            DropdownMenuItem(
+                                text = { Text("Trash") },
+                                onClick = {
+                                    menuExpanded = false
+                                    onOpenTrash()
+                                },
+                            )
+                            DropdownMenuItem(
+                                text = { Text("Export") },
                                 onClick = {
                                     menuExpanded = false
                                     viewModel.exportTasks()
+                                },
+                            )
+                            DropdownMenuItem(
+                                text = { Text("Settings") },
+                                onClick = {
+                                    menuExpanded = false
+                                    onOpenSettings()
                                 },
                             )
                         }
@@ -148,18 +185,10 @@ fun HomeScreen(
                 },
             )
         },
-        floatingActionButton = {
-            FloatingActionButton(
-                onClick = onAddTask,
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = Color.White,
-            ) {
-                Icon(Icons.Filled.Add, contentDescription = "Add task")
-            }
-        },
         snackbarHost = { SnackbarHost(snackbarHostState) },
         containerColor = MaterialTheme.colorScheme.background,
     ) { padding ->
+        Box(modifier = Modifier.fillMaxSize()) {
         when {
             uiState.isLoading -> {
                 Box(
@@ -171,12 +200,23 @@ fun HomeScreen(
                     Text("Loading…")
                 }
             }
-            uiState.tasks.isEmpty() -> {
+            uiState.error != null -> {
                 EmptyState(
-                    title = "Nothing planned yet",
-                    message = "Tap + to add your first task",
-                    actionLabel = "Add task",
-                    onAction = onAddTask,
+                    title = "Couldn’t load agenda",
+                    message = uiState.error ?: "",
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .padding(padding),
+                )
+            }
+            uiState.tasks.isEmpty() &&
+                uiState.agendaItems.isEmpty() &&
+                uiState.needsReview.isEmpty() -> {
+                EmptyState(
+                    title = "Nothing yet",
+                    message = "Tap + to add",
+                    actionLabel = "Add",
+                    onAction = { fabExpanded = true },
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(padding),
@@ -193,11 +233,46 @@ fun HomeScreen(
                     item {
                         TodayProgressHeader(stats = uiState.stats)
                     }
+                    if (uiState.needsReview.isNotEmpty()) {
+                        item {
+                            Text(
+                                "Review",
+                                style = MaterialTheme.typography.titleMedium,
+                                color = WarningAmber,
+                            )
+                        }
+                        items(uiState.needsReview, key = { "nr-${it.id}" }) { opp ->
+                            Card(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable { onOpenOpportunity(opp.id) },
+                                shape = RoundedCornerShape(12.dp),
+                            ) {
+                                Text(
+                                    opp.title,
+                                    style = MaterialTheme.typography.titleMedium,
+                                    modifier = Modifier.padding(12.dp),
+                                )
+                            }
+                        }
+                    }
+                    if (uiState.suggestions.isNotEmpty()) {
+                        item {
+                            Column(verticalArrangement = Arrangement.spacedBy(4.dp)) {
+                                uiState.suggestions.forEach { suggestion ->
+                                    Text(
+                                        suggestion.message,
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                    )
+                                }
+                            }
+                        }
+                    }
                     if (uiState.categories.isNotEmpty()) {
                         item {
                             LazyRow(
                                 horizontalArrangement = Arrangement.spacedBy(8.dp),
-                                modifier = Modifier.padding(bottom = 4.dp),
                             ) {
                                 item {
                                     FilterChip(
@@ -226,25 +301,88 @@ fun HomeScreen(
                             }
                         }
                     }
-                    item {
-                        Text(
-                            text = "${uiState.filteredTasks.count { !it.isCompleted }} active · " +
-                                "${uiState.filteredTasks.size} shown",
-                            style = MaterialTheme.typography.labelLarge,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.padding(bottom = 4.dp),
-                        )
-                    }
-                    if (uiState.filteredTasks.isEmpty()) {
+
+                    val overdue = uiState.agendaItems.filter { it.section == AgendaSection.OVERDUE }
+                    val today = uiState.agendaItems.filter { it.section == AgendaSection.TODAY }
+
+                    if (overdue.isNotEmpty()) {
                         item {
                             Text(
-                                "No tasks in this category",
+                                "Overdue",
+                                style = MaterialTheme.typography.titleMedium,
+                                color = DangerRed,
+                            )
+                        }
+                        items(overdue, key = { it.id }) { item ->
+                            AgendaItemCard(
+                                item = item,
+                                timeLabel = timeFormat.format(Date(item.sortTimeMs)),
+                                onClick = {
+                                    navigateAgendaItem(item, onOpenTask, onOpenOpportunity)
+                                },
+                            )
+                        }
+                    }
+
+                    item {
+                        Text("Agenda", style = MaterialTheme.typography.titleMedium)
+                    }
+                    if (today.isEmpty()) {
+                        item {
+                            Text(
+                                "Nothing today",
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.padding(vertical = 24.dp),
+                                modifier = Modifier.padding(vertical = 4.dp),
                             )
                         }
                     } else {
-                        items(uiState.filteredTasks, key = { it.id }) { task ->
+                        items(today, key = { it.id }) { item ->
+                            AgendaItemCard(
+                                item = item,
+                                timeLabel = timeFormat.format(Date(item.sortTimeMs)),
+                                onClick = {
+                                    navigateAgendaItem(item, onOpenTask, onOpenOpportunity)
+                                },
+                            )
+                        }
+                    }
+
+                    item {
+                        Text(
+                            "Tasks",
+                            style = MaterialTheme.typography.titleMedium,
+                            modifier = Modifier.padding(top = 8.dp),
+                        )
+                    }
+                    if (uiState.filteredTasks.isEmpty() && uiState.undatedTasks.isEmpty()) {
+                        item {
+                            Text(
+                                "None",
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                modifier = Modifier.padding(vertical = 4.dp),
+                            )
+                        }
+                    } else {
+                        items(uiState.filteredTasks, key = { "task-list-${it.id}" }) { task ->
+                            SwipeableTaskRow(
+                                task = task,
+                                categoryName = uiState.categoryNames[task.categoryId],
+                                onOpen = { onOpenTask(task.id) },
+                                onToggleComplete = { viewModel.toggleComplete(task) },
+                                onSwipeComplete = { viewModel.toggleComplete(task) },
+                                onSwipeDelete = { viewModel.deleteTask(task) },
+                            )
+                        }
+                    }
+                    if (uiState.undatedTasks.isNotEmpty()) {
+                        item {
+                            Text(
+                                "No date",
+                                style = MaterialTheme.typography.titleMedium,
+                                modifier = Modifier.padding(top = 8.dp),
+                            )
+                        }
+                        items(uiState.undatedTasks, key = { "undated-${it.id}" }) { task ->
                             SwipeableTaskRow(
                                 task = task,
                                 categoryName = uiState.categoryNames[task.categoryId],
@@ -258,6 +396,104 @@ fun HomeScreen(
                 }
             }
         }
+            ExpandableHomeFab(
+                expanded = fabExpanded,
+                onExpandedChange = { fabExpanded = it },
+                onAction = { action ->
+                    when (action) {
+                        HomeFabAction.ADD_TASK -> onAddTask()
+                        HomeFabAction.SCHEDULE_CALL -> onScheduleCall()
+                        HomeFabAction.ADD_EVENT -> onAddEvent()
+                        HomeFabAction.SAVE_OPPORTUNITY -> showCaptureSheet = true
+                    }
+                },
+            )
+        }
+    }
+
+    if (showCaptureSheet) {
+        CaptureOpportunitySheet(
+            captureSharedContent = viewModel.captureSharedContent,
+            onDismiss = { showCaptureSheet = false },
+            onManual = onAddOpportunityManual,
+            onCaptured = { id, openExtraction ->
+                if (openExtraction) onOpenExtraction(id) else onOpenOpportunity(id)
+            },
+            onError = { viewModel.showMessage(it) },
+        )
+    }
+}
+
+private fun navigateAgendaItem(
+    item: AgendaItem,
+    onOpenTask: (Long) -> Unit,
+    onOpenOpportunity: (Long) -> Unit,
+) {
+    item.opportunityId?.let {
+        onOpenOpportunity(it)
+        return
+    }
+    item.taskId?.let { onOpenTask(it) }
+}
+
+@Composable
+private fun AgendaItemCard(
+    item: AgendaItem,
+    timeLabel: String,
+    onClick: () -> Unit,
+) {
+    val accent = when (item.kind) {
+        AgendaItemKind.TASK_OVERDUE -> DangerRed
+        AgendaItemKind.OPPORTUNITY_DEADLINE -> WarningAmber
+        AgendaItemKind.OPPORTUNITY_EVENT -> MaterialTheme.colorScheme.primary
+        AgendaItemKind.REMINDER -> MaterialTheme.colorScheme.tertiary
+        AgendaItemKind.TASK_DUE -> MaterialTheme.colorScheme.onSurfaceVariant
+    }
+    val kindLabel = when (item.kind) {
+        AgendaItemKind.TASK_DUE -> "Due"
+        AgendaItemKind.TASK_OVERDUE -> "Overdue"
+        AgendaItemKind.REMINDER -> "Reminder"
+        AgendaItemKind.OPPORTUNITY_DEADLINE -> "Deadline"
+        AgendaItemKind.OPPORTUNITY_EVENT -> "Event"
+    }
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
+        shape = RoundedCornerShape(12.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = if (item.isCompleted) {
+                MaterialTheme.colorScheme.surfaceVariant
+            } else {
+                MaterialTheme.colorScheme.surface
+            },
+        ),
+    ) {
+        Column(
+            modifier = Modifier.padding(12.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+        ) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Text(
+                    text = item.title,
+                    style = MaterialTheme.typography.titleMedium,
+                    modifier = Modifier.weight(1f),
+                )
+                Text(
+                    text = timeLabel,
+                    style = MaterialTheme.typography.labelLarge,
+                    color = accent,
+                )
+            }
+            SuggestionChip(
+                onClick = {},
+                enabled = false,
+                label = { Text(kindLabel) },
+            )
+        }
     }
 }
 
@@ -266,29 +502,22 @@ private fun TodayProgressHeader(stats: CompletionStats) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(bottom = 8.dp),
+            .padding(bottom = 4.dp),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(16.dp),
     ) {
         CompletionRing(
             progress = stats.progress,
-            modifier = Modifier.size(56.dp),
+            modifier = Modifier.size(48.dp),
         )
-        Column {
-            Text(
-                text = "${stats.todayCompleted} of ${stats.todayTotal} due today",
-                style = MaterialTheme.typography.titleMedium,
-            )
-            Text(
-                text = if (stats.todayTotal == 0) {
-                    "No tasks scheduled for today"
-                } else {
-                    "${(stats.progress * 100).toInt()}% complete"
-                },
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-            )
-        }
+        Text(
+            text = if (stats.todayTotal == 0) {
+                "0 due"
+            } else {
+                "${stats.todayCompleted}/${stats.todayTotal} due"
+            },
+            style = MaterialTheme.typography.titleMedium,
+        )
     }
 }
 
@@ -299,7 +528,7 @@ private fun CompletionRing(
 ) {
     val track = MaterialTheme.colorScheme.surfaceVariant
     val progressColor = MaterialTheme.colorScheme.primary
-    Canvas(modifier = modifier.height(56.dp)) {
+    Canvas(modifier = modifier.height(48.dp)) {
         val stroke = Stroke(width = 8.dp.toPx(), cap = StrokeCap.Round)
         drawArc(
             color = track,

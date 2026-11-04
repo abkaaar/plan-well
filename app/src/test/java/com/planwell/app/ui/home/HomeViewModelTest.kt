@@ -1,10 +1,15 @@
 package com.planwell.app.ui.home
 
 import app.cash.turbine.test
+import com.planwell.app.domain.agenda.DailyAgenda
+import com.planwell.app.domain.agenda.DayBounds
 import com.planwell.app.domain.model.Category
 import com.planwell.app.domain.model.CompletionStats
 import com.planwell.app.domain.model.Task
+import com.planwell.app.domain.usecase.agenda.ObserveDailyAgendaUseCase
 import com.planwell.app.domain.usecase.category.GetCategoriesUseCase
+import com.planwell.app.domain.usecase.opportunity.CaptureSharedContentUseCase
+import com.planwell.app.domain.usecase.opportunity.ObserveInboxOpportunitiesUseCase
 import com.planwell.app.domain.usecase.task.CompleteTaskUseCase
 import com.planwell.app.domain.usecase.task.CompletionStatsUseCase
 import com.planwell.app.domain.usecase.task.DeleteTaskUseCase
@@ -34,6 +39,9 @@ class HomeViewModelTest {
     private val getTasks: GetTasksUseCase = mockk()
     private val getCategories: GetCategoriesUseCase = mockk()
     private val completionStats: CompletionStatsUseCase = mockk()
+    private val observeAgenda: ObserveDailyAgendaUseCase = mockk()
+    private val observeInbox: ObserveInboxOpportunitiesUseCase = mockk()
+    private val captureShared: CaptureSharedContentUseCase = mockk(relaxed = true)
     private val completeTask: CompleteTaskUseCase = mockk(relaxed = true)
     private val deleteTask: DeleteTaskUseCase = mockk(relaxed = true)
     private val restoreTask: RestoreTaskUseCase = mockk(relaxed = true)
@@ -44,7 +52,7 @@ class HomeViewModelTest {
         Dispatchers.setMain(dispatcher)
         every { getTasks() } returns flowOf(
             listOf(
-                Task(id = 1, title = "Work task", categoryId = 10),
+                Task(id = 1, title = "Work task", categoryId = 10, dueDateMs = 1L),
                 Task(id = 2, title = "Personal", categoryId = 20),
             ),
         )
@@ -52,6 +60,14 @@ class HomeViewModelTest {
             listOf(Category(id = 10, name = "Work"), Category(id = 20, name = "Personal")),
         )
         every { completionStats(any()) } returns flowOf(CompletionStats(2, 1))
+        every { observeAgenda(any()) } returns flowOf(
+            DailyAgenda(
+                day = DayBounds(0L, 1L),
+                items = emptyList(),
+                suggestions = emptyList(),
+            ),
+        )
+        every { observeInbox() } returns flowOf(emptyList())
     }
 
     @After
@@ -63,6 +79,9 @@ class HomeViewModelTest {
         getTasks,
         getCategories,
         completionStats,
+        observeAgenda,
+        observeInbox,
+        captureShared,
         completeTask,
         deleteTask,
         restoreTask,
@@ -76,9 +95,10 @@ class HomeViewModelTest {
         vm.uiState.test {
             val initial = awaitItem()
             val ready = if (initial.isLoading) awaitItem() else initial
-            assertEquals(2, ready.filteredTasks.size)
+            assertEquals(1, ready.filteredTasks.size)
+            assertEquals(1, ready.undatedTasks.size)
 
-            vm.selectCategory(10)
+            vm.selectCategory(10L)
             advanceUntilIdle()
             val filtered = awaitItem()
             assertEquals(listOf(1L), filtered.filteredTasks.map { it.id })

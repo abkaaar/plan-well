@@ -6,6 +6,7 @@ import android.content.Context
 import android.content.Intent
 import android.os.Build
 import com.planwell.app.domain.model.Reminder
+import com.planwell.app.domain.model.ScheduledCall
 import dagger.hilt.android.qualifiers.ApplicationContext
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -17,11 +18,39 @@ class ReminderScheduler @Inject constructor(
 ) {
     fun schedule(reminder: Reminder) {
         val pendingIntent = buildPendingIntent(reminder.id, reminder.taskId)
+        setWakeupAlarm(reminder.triggerAtMs, pendingIntent)
+    }
 
+    fun cancel(reminderId: Long) {
+        alarmManager.cancel(buildPendingIntent(reminderId, taskId = 0))
+    }
+
+    fun scheduleCall(call: ScheduledCall) {
+        val pendingIntent = CallReminderIntents.alarmPendingIntent(
+            context = context,
+            callId = call.id,
+            phoneNumber = call.phoneNumber,
+            displayName = call.displayName,
+        )
+        setWakeupAlarm(call.scheduledAtMs, pendingIntent)
+    }
+
+    fun cancelCall(callId: Long) {
+        alarmManager.cancel(
+            CallReminderIntents.alarmPendingIntent(
+                context = context,
+                callId = callId,
+                phoneNumber = "",
+                displayName = "",
+            ),
+        )
+    }
+
+    private fun setWakeupAlarm(triggerAtMs: Long, pendingIntent: PendingIntent) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S && !alarmManager.canScheduleExactAlarms()) {
             alarmManager.setWindow(
                 AlarmManager.RTC_WAKEUP,
-                reminder.triggerAtMs,
+                triggerAtMs,
                 AlarmManager.INTERVAL_FIFTEEN_MINUTES / 4,
                 pendingIntent,
             )
@@ -30,13 +59,9 @@ class ReminderScheduler @Inject constructor(
 
         alarmManager.setExactAndAllowWhileIdle(
             AlarmManager.RTC_WAKEUP,
-            reminder.triggerAtMs,
+            triggerAtMs,
             pendingIntent,
         )
-    }
-
-    fun cancel(reminderId: Long) {
-        alarmManager.cancel(buildPendingIntent(reminderId, taskId = 0))
     }
 
     private fun buildPendingIntent(reminderId: Long, taskId: Long): PendingIntent {

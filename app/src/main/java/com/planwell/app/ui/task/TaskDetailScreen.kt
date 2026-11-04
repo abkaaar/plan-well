@@ -53,6 +53,7 @@ import java.util.Locale
 fun TaskDetailScreen(
     onBack: () -> Unit,
     onEdit: (Long) -> Unit,
+    onOpenOpportunity: (Long) -> Unit = {},
     viewModel: TaskDetailViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
@@ -166,6 +167,12 @@ fun TaskDetailScreen(
                         "Category: $name",
                         style = MaterialTheme.typography.bodyMedium,
                     )
+                }
+                uiState.sourceOpportunity?.let { opportunity ->
+                    Text("Source opportunity", style = MaterialTheme.typography.titleMedium)
+                    TextButton(onClick = { onOpenOpportunity(opportunity.id) }) {
+                        Text(opportunity.title)
+                    }
                 }
 
                 Text("Reminders", style = MaterialTheme.typography.titleMedium)

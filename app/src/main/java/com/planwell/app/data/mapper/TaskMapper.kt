@@ -17,6 +17,9 @@ fun TaskEntity.toDomain(): Task =
         isDeleted = isDeleted,
         createdAtMs = createdAtMs,
         updatedAtMs = updatedAtMs,
+        sourceType = sourceType,
+        sourceImagePath = sourceImagePath,
+        sourceUrl = sourceUrl,
     )
 
 fun Task.toEntity(): TaskEntity =
@@ -32,4 +35,7 @@ fun Task.toEntity(): TaskEntity =
         isDeleted = isDeleted,
         createdAtMs = createdAtMs,
         updatedAtMs = updatedAtMs,
+        sourceType = sourceType,
+        sourceImagePath = sourceImagePath,
+        sourceUrl = sourceUrl,
     )

@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface ReminderRepository {
     fun observeActiveRemindersForTask(taskId: Long): Flow<List<Reminder>>
+    fun observeAllActiveReminders(): Flow<List<Reminder>>
     suspend fun getActiveRemindersForTask(taskId: Long): List<Reminder>
     suspend fun getAllActiveReminders(): List<Reminder>
     suspend fun getReminder(id: Long): Reminder?

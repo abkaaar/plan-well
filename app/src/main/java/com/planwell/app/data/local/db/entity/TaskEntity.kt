@@ -30,4 +30,8 @@ data class TaskEntity(
     @ColumnInfo(name = "is_deleted") val isDeleted: Boolean = false,
     @ColumnInfo(name = "created_at_ms") val createdAtMs: Long = System.currentTimeMillis(),
     @ColumnInfo(name = "updated_at_ms") val updatedAtMs: Long = System.currentTimeMillis(),
+    /** Provenance: e.g. SHARE_IMPORT. Not indexed by FTS. */
+    @ColumnInfo(name = "source_type") val sourceType: String? = null,
+    @ColumnInfo(name = "source_image_path") val sourceImagePath: String? = null,
+    @ColumnInfo(name = "source_url") val sourceUrl: String? = null,
 )

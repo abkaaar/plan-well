@@ -20,6 +20,9 @@ class ReminderRepositoryImpl @Inject constructor(
     override fun observeActiveRemindersForTask(taskId: Long): Flow<List<Reminder>> =
         reminderDao.observeActiveRemindersForTask(taskId).map { list -> list.map { it.toDomain() } }
 
+    override fun observeAllActiveReminders(): Flow<List<Reminder>> =
+        reminderDao.observeAllActiveReminders().map { list -> list.map { it.toDomain() } }
+
     override suspend fun getActiveRemindersForTask(taskId: Long): List<Reminder> =
         reminderDao.getActiveRemindersForTask(taskId).map { it.toDomain() }
 

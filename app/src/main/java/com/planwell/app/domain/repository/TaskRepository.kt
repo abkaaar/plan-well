@@ -11,6 +11,8 @@ interface TaskRepository {
     fun searchTasks(ftsQuery: String): Flow<List<Task>>
     fun observeCompletionStats(startMs: Long, endMs: Long): Flow<CompletionStats>
     suspend fun getTask(id: Long): Task?
+    fun observeTasksByIds(ids: List<Long>): Flow<List<Task>>
+    suspend fun getTasksByIds(ids: List<Long>): List<Task>
     suspend fun createTask(task: Task): Long
     suspend fun updateTask(task: Task)
     suspend fun softDelete(id: Long)
